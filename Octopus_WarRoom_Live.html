@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Octopus War Room Live</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --bg-0: #07131d;
+      --bg-1: #0d1f2c;
+      --bg-2: #122c3f;
+      --card: rgba(9, 28, 40, 0.74);
+      --line: rgba(104, 197, 255, 0.25);
+      --line-strong: rgba(104, 197, 255, 0.58);
+      --text: #eaf7ff;
+      --muted: #95bdcf;
+      --accent: #68c5ff;
+      --accent-2: #2de4c6;
+      --warn: #ffbe55;
+      --bad: #ff6f7a;
+      --good: #8cf78f;
+      --yellow: #ffd257;
+      --redorange: #ff8d5c;
+      --blue: #5fa9ff;
+      --green: #6de49a;
+      --purple: #c78bff;
+      --radius: 14px;
+      --maxw: 1260px;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 14% -10%, #1f3d55 0%, rgba(31, 61, 85, 0) 36%),
+        radial-gradient(circle at 92% -25%, #2a5e7f 0%, rgba(42, 94, 127, 0) 40%),
+        linear-gradient(160deg, var(--bg-0), var(--bg-1) 42%, var(--bg-2));
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(104, 197, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(104, 197, 255, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      z-index: -1;
+    }
+
+    .wrap {
+      width: min(var(--maxw), calc(100% - 28px));
+      margin: 20px auto 36px;
+    }
+
+    .top {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      background: linear-gradient(180deg, rgba(13, 31, 44, 0.86), rgba(9, 23, 34, 0.8));
+      box-shadow: var(--shadow);
+    }
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: clamp(24px, 4vw, 36px);
+      margin: 0;
+      letter-spacing: 0.4px;
+    }
+
+    .sub {
+      margin-top: 8px;
+      color: var(--muted);
+      max-width: 880px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .badge {
+      border: 1px solid var(--line-strong);
+      color: var(--accent);
+      background: rgba(10, 38, 55, 0.8);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      white-space: nowrap;
+    }
+
+    .controls {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button,
+    .link-btn {
+      border: 1px solid var(--line);
+      background: rgba(9, 31, 44, 0.82);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      transition: 180ms ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    button:hover,
+    .link-btn:hover { border-color: var(--line-strong); transform: translateY(-1px); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    .btn-main {
+      background: linear-gradient(90deg, rgba(43, 120, 171, 0.8), rgba(42, 150, 125, 0.8));
+      border-color: rgba(170, 234, 255, 0.42);
+    }
+
+    .layout {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 14px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(11, 36, 52, 0.6);
+    }
+
+    .metric .k { color: var(--muted); font-size: 11px; font-family: 'IBM Plex Mono', monospace; }
+    .metric .v { margin-top: 6px; font-size: 21px; font-weight: 700; }
+
+    .agents {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .agent {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(9, 31, 44, 0.68);
+      min-height: 232px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .agent::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 180ms ease;
+    }
+
+    .agent.running::after { opacity: 1; }
+
+    .a-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .a-name {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .a-role {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+    }
+
+    .tag {
+      font-size: 10px;
+      border-radius: 99px;
+      border: 1px solid;
+      padding: 4px 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+    }
+
+    .idle { color: var(--muted); border-color: rgba(149, 189, 207, 0.4); }
+    .running-tag { color: var(--warn); border-color: rgba(255, 190, 85, 0.6); }
+    .done { color: var(--good); border-color: rgba(140, 247, 143, 0.6); }
+
+    .bar {
+      height: 7px;
+      margin-top: 11px;
+      background: rgba(88, 146, 176, 0.24);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 180ms linear;
+    }
+
+    .task {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      min-height: 34px;
+    }
+
+    .findings {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      height: 120px;
+      overflow: auto;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #d4edf9;
+    }
+
+    .findings li { margin-bottom: 5px; }
+
+    .stream {
+      height: 314px;
+      overflow: auto;
+      padding: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      line-height: 1.45;
+      color: #d3edff;
+      background: rgba(5, 20, 31, 0.58);
+    }
+
+    .stream-line { margin-bottom: 7px; }
+    .stream-line .t { color: #87bfd9; margin-right: 8px; }
+    .stream-line .src { color: #9be4cd; margin-right: 8px; }
+
+    .handoffs {
+      height: 314px;
+      overflow: auto;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .handoff {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(12, 38, 56, 0.66);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .handoff .h-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .flow {
+      margin-top: 14px;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .flow-line {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .node {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      min-height: 54px;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      color: var(--muted);
+      background: rgba(12, 34, 50, 0.62);
+    }
+
+    .node.active {
+      color: var(--text);
+      border-color: var(--line-strong);
+      box-shadow: 0 0 0 1px rgba(153, 229, 255, 0.2) inset;
+    }
+
+    .docs {
+      margin-top: 14px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .intel {
+      margin-top: 14px;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .intel-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .intel-title {
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .intel-agent {
+      color: var(--accent);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: rgba(7, 32, 46, 0.62);
+    }
+
+    .intel-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .intel-tab {
+      border: 1px solid var(--line);
+      background: rgba(8, 30, 44, 0.62);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+      cursor: pointer;
+    }
+
+    .intel-tab.active {
+      color: var(--text);
+      border-color: var(--line-strong);
+      background: rgba(30, 83, 116, 0.35);
+    }
+
+    .intel-body {
+      display: none;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(7, 24, 35, 0.66);
+    }
+
+    .intel-body.active { display: block; }
+
+    .finding-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 10px;
+    }
+
+    .finding-list {
+      display: grid;
+      gap: 8px;
+      max-height: 220px;
+      overflow: auto;
+    }
+
+    .finding-btn {
+      border: 1px solid var(--line);
+      background: rgba(10, 35, 51, 0.72);
+      color: #d6f0ff;
+      border-radius: 9px;
+      padding: 9px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .finding-btn.active {
+      border-color: var(--line-strong);
+      background: rgba(35, 97, 134, 0.31);
+    }
+
+    .finding-detail {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 10px;
+      min-height: 150px;
+      font-size: 12px;
+      color: #d9f2ff;
+      line-height: 1.5;
+      background: rgba(9, 30, 44, 0.72);
+    }
+
+    .live-feed {
+      max-height: 260px;
+      overflow: auto;
+      display: grid;
+      gap: 8px;
+    }
+
+    .feed-item {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 9px;
+      background: rgba(10, 35, 51, 0.72);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .feed-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .viz-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .viz-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(9, 30, 44, 0.72);
+      min-height: 120px;
+    }
+
+    .viz-k {
+      color: var(--muted);
+      font-size: 10px;
+      font-family: 'IBM Plex Mono', monospace;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .mini-bar {
+      height: 8px;
+      background: rgba(105, 162, 194, 0.27);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .mini-bar span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .banner {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      min-height: 90px;
+      padding: 12px;
+      display: grid;
+      align-content: center;
+      gap: 6px;
+      background: linear-gradient(135deg, rgba(37, 88, 121, 0.66), rgba(33, 137, 116, 0.5));
+    }
+
+    .banner .slogan {
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.2px;
+    }
+
+    .banner .subline {
+      color: #cceeff;
+      font-size: 12px;
+    }
+
+    .newsroom {
+      margin-top: 14px;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .news-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .news-meta {
+      color: var(--muted);
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .news-article {
+      border: 1px solid #d6d0c4;
+      border-radius: 4px;
+      padding: 18px;
+      background: #f7f2e8;
+      color: #1c1c1c;
+      display: grid;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
+    }
+
+    .news-masthead {
+      border-bottom: 2px solid #232323;
+      padding-bottom: 8px;
+      margin-bottom: 2px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .news-paper {
+      font-size: 24px;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    .news-edition {
+      font-size: 11px;
+      color: #444;
+      font-family: 'IBM Plex Mono', monospace;
+      text-transform: uppercase;
+    }
+
+    .news-kicker {
+      color: #4a4a4a;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .news-headline {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(18px, 2.5vw, 26px);
+      font-weight: 700;
+      line-height: 1.3;
+      color: #111;
+    }
+
+    .news-dek {
+      color: #2f2f2f;
+      font-size: 14px;
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.5;
+      border-bottom: 1px solid #d1c8b7;
+      padding-bottom: 10px;
+    }
+
+    .news-byline {
+      font-size: 11px;
+      color: #4e4e4e;
+      font-family: 'IBM Plex Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .news-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 14px;
+      color: #202020;
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.45;
+    }
+
+    .news-story {
+      font-family: Georgia, "Times New Roman", serif;
+      color: #1d1d1d;
+      column-count: 2;
+      column-gap: 22px;
+      column-rule: 1px solid #d8d0c0;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .news-story p {
+      margin: 0 0 12px;
+      break-inside: avoid;
+    }
+
+    .news-dropcap::first-letter {
+      float: left;
+      font-size: 44px;
+      line-height: 0.88;
+      padding-right: 7px;
+      font-weight: 700;
+    }
+
+    .news-quote {
+      border-left: 3px solid #3d3d3d;
+      padding-left: 10px;
+      margin: 8px 0 12px;
+      font-style: italic;
+      color: #2b2b2b;
+      break-inside: avoid;
+    }
+
+    .factbox {
+      border: 1px solid #cfc4ad;
+      background: #efe7d7;
+      border-radius: 4px;
+      padding: 10px;
+      break-inside: avoid;
+      margin: 6px 0 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .factbox b {
+      display: block;
+      margin-bottom: 5px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: #47433b;
+    }
+
+    .source-list {
+      border-top: 1px solid #d5c9b5;
+      padding-top: 10px;
+      font-size: 12px;
+      color: #353535;
+      font-family: 'IBM Plex Mono', monospace;
+      line-height: 1.5;
+    }
+
+    .source-list a {
+      color: #1f4f73;
+      text-decoration: none;
+    }
+
+    .source-list a:hover { text-decoration: underline; }
+
+    .contrib-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .contrib {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 8px;
+      background: rgba(10, 35, 51, 0.72);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .contrib b {
+      display: block;
+      margin-bottom: 5px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .news-archive {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      max-height: 180px;
+      overflow: auto;
+      background: rgba(6, 22, 33, 0.72);
+    }
+
+    .archive-item {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(104, 197, 255, 0.12);
+      font-size: 12px;
+      cursor: pointer;
+      color: #d7f0fc;
+    }
+
+    .archive-item:last-child { border-bottom: none; }
+    .archive-item:hover { background: rgba(35, 97, 134, 0.2); }
+
+    @media (max-width: 860px) {
+      .news-story {
+        column-count: 1;
+      }
+    }
+
+    .small-note {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .agent-yellow { border-left: 3px solid var(--yellow); }
+    .agent-redorange { border-left: 3px solid var(--redorange); }
+    .agent-blue { border-left: 3px solid var(--blue); }
+    .agent-green { border-left: 3px solid var(--green); }
+    .agent-purple { border-left: 3px solid var(--purple); }
+
+    @media (max-width: 1020px) {
+      .layout { grid-template-columns: 1fr; }
+      .status-grid { grid-template-columns: repeat(2, 1fr); }
+      .agents { grid-template-columns: 1fr; }
+      .docs { grid-template-columns: 1fr; }
+      .flow-line { grid-template-columns: 1fr; }
+      .finding-grid { grid-template-columns: 1fr; }
+      .viz-grid { grid-template-columns: 1fr; }
+      .contrib-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="top">
+      <div class="title">
+        <div>
+          <h1>OCTOPUS WAR ROOM LIVE</h1>
+          <div class="sub">
+            Interactive campaign simulation dashboard for a fictional high-stakes election. Activate all agents once,
+            watch live execution, inspect findings, and track handoffs from research to design to build to distribution,
+            then final Purple synthesis.
+          </div>
+        </div>
+        <div class="badge" id="clock">STATE: READY</div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-main" id="startAll">Activate Full Pipeline</button>
+        <button id="pauseBtn" disabled>Pause</button>
+        <button id="resumeBtn" disabled>Resume</button>
+        <button id="resetBtn">Reset</button>
+        <button id="generateNews">Generate Article Now</button>
+        <button id="startYellow">Run Yellow</button>
+        <button id="startRed">Run Red-Orange</button>
+        <button id="startBlue">Run Blue</button>
+        <button id="startGreen">Run Green</button>
+        <button id="startPurple">Run Purple Synthesis</button>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div>
+        <article class="panel">
+          <div class="panel-head">
+            <span>Mission Pulse</span>
+            <span id="runLabel">NO ACTIVE RUN</span>
+          </div>
+          <div class="status-grid">
+            <div class="metric"><div class="k">Workflow Progress</div><div class="v" id="workflowPct">0%</div></div>
+            <div class="metric"><div class="k">Signals Processed</div><div class="v" id="signals">0</div></div>
+            <div class="metric"><div class="k">Handoffs Complete</div><div class="v" id="handoffCount">0</div></div>
+            <div class="metric"><div class="k">Trust Guardrail</div><div class="v" id="trustIndex">Stable</div></div>
+          </div>
+        </article>
+
+        <div class="agents" id="agentGrid"></div>
+
+        <article class="panel flow">
+          <div class="panel-head"><span>Workflow View</span><span id="activeStage">STAGE: WAITING</span></div>
+          <div class="flow-line" id="flowLine"></div>
+        </article>
+      </div>
+
+      <div>
+        <article class="panel">
+          <div class="panel-head"><span>Live Event Stream</span><span id="eventCount">0 entries</span></div>
+          <div class="stream" id="stream"></div>
+        </article>
+
+        <article class="panel" style="margin-top:14px;">
+          <div class="panel-head"><span>Real-Time Handoffs</span><span id="handoffLabel">0 created</span></div>
+          <div class="handoffs" id="handoffs"></div>
+        </article>
+      </div>
+    </section>
+
+    <article class="panel docs">
+      <a class="link-btn" href="WAR_ROOM_FULL_PIPELINE_FINDINGS.md" target="_blank">Open Consolidated Findings</a>
+      <a class="link-btn" href="WAR_ROOM_CHARTER.md" target="_blank">Open War Room Charter</a>
+      <a class="link-btn" href="DECISION_SCORECARD_TEMPLATE.md" target="_blank">Open Decision Scorecard</a>
+      <a class="link-btn" href="CRISIS_PLAYBOOK_MATRIX.md" target="_blank">Open Crisis Matrix</a>
+      <a class="link-btn" href="SIMULATION_RUNBOOK_7_DAY.md" target="_blank">Open 7-Day Runbook</a>
+      <a class="link-btn" href="index.html" target="_blank">Open Main Octopus Site</a>
+      <div class="small-note">
+        Note: This page is an interactive orchestrator simulation UI. It visualizes live pipeline execution and handoffs from the
+        findings already generated in this workspace.
+      </div>
+    </article>
+
+    <article class="panel intel">
+      <div class="intel-top">
+        <div class="intel-title">Agent Intelligence Console</div>
+        <div class="intel-agent" id="intelAgent">SELECTED: YELLOW RESEARCHER</div>
+      </div>
+
+      <div class="intel-tabs">
+        <button class="intel-tab active" data-tab="findings">Key Findings</button>
+        <button class="intel-tab" data-tab="live">Live Feed</button>
+        <button class="intel-tab" data-tab="visual">Visual Lab</button>
+      </div>
+
+      <div class="intel-body active" id="intel-findings">
+        <div class="finding-grid">
+          <div class="finding-list" id="findingList"></div>
+          <div class="finding-detail" id="findingDetail">Click a finding to inspect details and decision implications.</div>
+        </div>
+      </div>
+
+      <div class="intel-body" id="intel-live">
+        <div class="live-feed" id="liveFeed"></div>
+      </div>
+
+      <div class="intel-body" id="intel-visual">
+        <div class="viz-grid" id="visualLab"></div>
+      </div>
+    </article>
+
+    <article class="panel newsroom">
+      <div class="panel-head">
+        <span>Octopus Newswire</span>
+        <span id="newsCycle">AUTO CYCLE: EVERY 3 HOURS</span>
+      </div>
+
+      <div class="news-controls">
+        <button id="downloadPdf">Download Current Article PDF</button>
+        <button id="toggleDemo">Demo Mode: Off</button>
+        <span class="news-meta" id="newsMeta">No article generated yet.</span>
+      </div>
+
+      <section class="news-article" id="newsArticle">
+        <div class="news-masthead">
+          <div class="news-paper">The Octopus Daily</div>
+          <div class="news-edition">Special Simulation Edition</div>
+        </div>
+        <div class="news-kicker">WAR ROOM BRIEF</div>
+        <div class="news-headline">Awaiting first generated article</div>
+        <div class="news-byline">By Octopus News Desk</div>
+        <div class="news-dek">Run agents or trigger article generation to publish a full plain-language report with sourcing.</div>
+        <div class="news-story">
+          <p class="news-dropcap">This panel publishes a newspaper-style article after each simulation cycle. It includes a short report, context paragraph, quote, and a source section.</p>
+          <p>The article format is designed for presentation and review, with the same look and rhythm as a real newspaper cutout.</p>
+        </div>
+        <div class="source-list">Sources will appear here after first publication.</div>
+      </section>
+
+      <div class="contrib-grid" id="contribGrid"></div>
+
+      <div class="news-archive" id="newsArchive"></div>
+    </article>
+  </div>
+
+  <script>
+    const agents = [
+      {
+        id: "yellow",
+        colorClass: "agent-yellow",
+        name: "Yellow Researcher",
+        role: "Intelligence and Analysis",
+        stream: [
+          "Trust elasticity detected as primary swing variable.",
+          "Volatile blocs identified: economic strivers, youth abstainers, suburban stabilizers.",
+          "Closed-loop misinformation pathways mapped across private channels.",
+          "Regional grievance narratives flagged as high amplification risk.",
+          "Early warning indicators defined for narrative contagion and legitimacy threats."
+        ],
+        findings: [
+          "Credibility shocks outmove policy releases in low-trust moments.",
+          "Turnout elasticity, not ideology, drives final swing margins.",
+          "Trust-collapse cascade is the highest systemic threat."
+        ],
+        artifacts: ["Research brief", "Segment map", "Early warning list"]
+      },
+      {
+        id: "red",
+        colorClass: "agent-redorange",
+        name: "Red-Orange Designer",
+        role: "Solutions and Architecture",
+        stream: [
+          "War room architecture drafted with triage, decision core, and message factory.",
+          "Severity model T1/T2/T3 anchored with response SLAs.",
+          "Message consistency framework and Message ID system structured.",
+          "Crisis card templates designed for 30 min, 3 hr, 24 hr windows.",
+          "Quality gates and stop-the-line protocol integrated into workflow."
+        ],
+        findings: [
+          "Most failures occur at handoffs, not strategy theory.",
+          "Line-lock ritual and versioned message IDs prevent contradiction.",
+          "Trust scoring before speed prevents narrative whiplash."
+        ],
+        artifacts: ["System architecture", "Decision workflow", "Crisis templates"]
+      },
+      {
+        id: "blue",
+        colorClass: "agent-blue",
+        name: "Blue Maker",
+        role: "Code and Infrastructure",
+        stream: [
+          "Stream-first decision engine blueprint initialized.",
+          "Schema separation defined: signals, decisions, ethics assessments.",
+          "Scoring pseudocode and constrained scenario simulator prepared.",
+          "Incident automations mapped for drift, integrity, and audit failures.",
+          "Verification plan balanced across speed, fairness, and recoverability."
+        ],
+        findings: [
+          "Ethics gates must execute before recommendation release.",
+          "Audit lineage must be immutable and signed.",
+          "Feature freshness matters more than model complexity in crisis cycles."
+        ],
+        artifacts: ["Architecture blueprint", "Data schema", "Test plan"]
+      },
+      {
+        id: "green",
+        colorClass: "agent-green",
+        name: "Green Marketer",
+        role: "Distribution and Growth",
+        stream: [
+          "Trust-first segment positioning matrix compiled.",
+          "Regional channel strategy and reserve budget logic set.",
+          "Seven-day message calendar aligned with consistency controls.",
+          "Rapid rebuttal content system prepared with correction SLAs.",
+          "Attribution model linked to trust, persuasion, and turnout outcomes."
+        ],
+        findings: [
+          "Core narrative must stay fixed while proof localizes.",
+          "Visible corrections increase legitimacy over silent edits.",
+          "Community validators outperform broad influencers for trust transfer."
+        ],
+        artifacts: ["Positioning matrix", "Channel plan", "Rebuttal system"]
+      },
+      {
+        id: "purple",
+        colorClass: "agent-purple",
+        name: "Purple Manager",
+        role: "Orchestration and Synthesis",
+        stream: [
+          "Cross-agent outputs merged into one strategic command view.",
+          "Conflicts resolved under trust-first constraints and ethics gates.",
+          "Closed-loop operations confirmed: sense, score, simulate, gate, deploy, learn.",
+          "Risk posture updated with exploitability and backlash scoring.",
+          "Final integrated package published for decision-ready execution."
+        ],
+        findings: [
+          "Winning requires trust-adjusted speed and strict coherence.",
+          "Ethics controls are strategic multipliers, not overhead.",
+          "Auditability is non-negotiable in fragile-trust environments."
+        ],
+        artifacts: ["Synthesis memo", "Decision package", "Next actions"]
+      }
+    ];
+
+    const flowOrder = ["yellow", "red", "blue", "green", "purple"];
+    const agentState = {};
+    const timers = new Set();
+    let intelFeedTimer = null;
+    let visualTimer = null;
+    let articleTimer = null;
+    let selectedAgentId = "yellow";
+    let selectedFindingIndex = 0;
+    let intelTab = "findings";
+    let articleCounter = 0;
+    let demoMode = false;
+    let latestArticle = null;
+    const articleArchive = [];
+    const NEWS_INTERVAL_MS = 3 * 60 * 60 * 1000;
+    const NEWS_DEMO_MS = 30 * 1000;
+
+    let paused = false;
+    let runningPipeline = false;
+    let eventCounter = 0;
+    let handoffCounter = 0;
+    let signalCounter = 0;
+
+    const el = {
+      grid: document.getElementById("agentGrid"),
+      flowLine: document.getElementById("flowLine"),
+      stream: document.getElementById("stream"),
+      handoffs: document.getElementById("handoffs"),
+      eventCount: document.getElementById("eventCount"),
+      handoffLabel: document.getElementById("handoffLabel"),
+      handoffCount: document.getElementById("handoffCount"),
+      workflowPct: document.getElementById("workflowPct"),
+      runLabel: document.getElementById("runLabel"),
+      activeStage: document.getElementById("activeStage"),
+      signals: document.getElementById("signals"),
+      trustIndex: document.getElementById("trustIndex"),
+      clock: document.getElementById("clock"),
+      startAll: document.getElementById("startAll"),
+      pauseBtn: document.getElementById("pauseBtn"),
+      resumeBtn: document.getElementById("resumeBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      generateNews: document.getElementById("generateNews"),
+      downloadPdf: document.getElementById("downloadPdf"),
+      toggleDemo: document.getElementById("toggleDemo"),
+      newsArticle: document.getElementById("newsArticle"),
+      contribGrid: document.getElementById("contribGrid"),
+      newsArchive: document.getElementById("newsArchive"),
+      newsMeta: document.getElementById("newsMeta"),
+      newsCycle: document.getElementById("newsCycle")
+    };
+
+    function nowTime() {
+      return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    }
+
+    function log(source, msg) {
+      eventCounter += 1;
+      const line = document.createElement("div");
+      line.className = "stream-line";
+      line.innerHTML = `<span class="t">${nowTime()}</span><span class="src">${source}</span>${msg}`;
+      el.stream.prepend(line);
+      el.eventCount.textContent = `${eventCounter} entries`;
+    }
+
+    function addHandoff(fromAgent, toAgent, summary, artifacts, nextNeed) {
+      handoffCounter += 1;
+      const card = document.createElement("div");
+      card.className = "handoff";
+      card.innerHTML = `
+        <div class="h-title">HANDOFF ${handoffCounter}: ${fromAgent} -> ${toAgent}</div>
+        <div><strong>What was done:</strong> ${summary}</div>
+        <div><strong>Artifacts:</strong> ${artifacts.join(", ")}</div>
+        <div><strong>Next:</strong> ${nextNeed}</div>
+      `;
+      el.handoffs.prepend(card);
+      el.handoffLabel.textContent = `${handoffCounter} created`;
+      el.handoffCount.textContent = String(handoffCounter);
+    }
+
+    function renderAgents() {
+      el.grid.innerHTML = "";
+      agents.forEach((a) => {
+        agentState[a.id] = { status: "idle", progress: 0, findingsShown: 0, streamShown: 0 };
+        const node = document.createElement("article");
+        node.className = `agent ${a.colorClass}`;
+        node.id = `agent-${a.id}`;
+        node.innerHTML = `
+          <div class="a-top">
+            <div>
+              <div class="a-name">${a.name}</div>
+              <div class="a-role">${a.role}</div>
+            </div>
+            <span class="tag idle" id="tag-${a.id}">idle</span>
+          </div>
+          <div class="bar"><span id="bar-${a.id}"></span></div>
+          <div class="task" id="task-${a.id}">Waiting for activation.</div>
+          <ul class="findings" id="findings-${a.id}"></ul>
+        `;
+        node.addEventListener("click", () => selectAgent(a.id));
+        el.grid.appendChild(node);
+      });
+    }
+
+    function renderFlow() {
+      el.flowLine.innerHTML = "";
+      flowOrder.forEach((id) => {
+        const a = agents.find((x) => x.id === id);
+        const n = document.createElement("div");
+        n.className = "node";
+        n.id = `flow-${id}`;
+        n.textContent = a.name.split(" ")[0];
+        n.addEventListener("click", () => selectAgent(id));
+        el.flowLine.appendChild(n);
+      });
+    }
+
+    const intelData = {
+      yellow: {
+        findingDetails: [
+          {
+            title: "Credibility shocks outpace policy",
+            detail: "Negative trust events move undecided blocs faster than policy release cycles. Recommended action: pre-stage verification packets and correction protocol before policy launch windows."
+          },
+          {
+            title: "Turnout elasticity is decisive",
+            detail: "Swing outcome depends on mobilizing low-trust and low-frequency voters. Recommended action: track turnout intent by segment daily and trigger corrective outreach when intent drops."
+          },
+          {
+            title: "Closed-loop misinformation risk",
+            detail: "Private channels spread narratives faster than public corrections. Recommended action: deploy local validators and pre-approved myth-vs-fact cards with source links."
+          }
+        ],
+        liveTemplates: [
+          "Breaking narrative: economic anxiety mentions +18% in industrial belt clusters.",
+          "Media pulse: legitimacy framing appears in 3 mainstream talk panels.",
+          "Social surge: edited clip keyword velocity crosses watch threshold.",
+          "Field desk: suburban volunteers report stability message landing better than attack lines.",
+          "Signal watch: youth sentiment improves after transparency Q and A segment."
+        ]
+      },
+      red: {
+        findingDetails: [
+          {
+            title: "Handoffs are the failure point",
+            detail: "Decision errors often occur when context is not transferred cleanly. Recommended action: enforce mandatory handoff card with done artifacts and next-owner requirements."
+          },
+          {
+            title: "Message ID prevents drift",
+            detail: "Versioned message IDs keep all channels aligned under pressure. Recommended action: block publication if content references stale message IDs."
+          },
+          {
+            title: "Tiered SLAs reduce panic",
+            detail: "T1, T2, T3 severity model prevents overreaction to low-signal noise while preserving urgency for true crises."
+          }
+        ],
+        liveTemplates: [
+          "Workflow update: T2 decision path selected with legal pre-check branch.",
+          "Design gate: contradiction scan passed for regional adaptation pack.",
+          "Template action: 3-hour crisis sheet generated and routed to comms.",
+          "Control room: message spine unchanged, local examples refreshed.",
+          "Escalation map: candidate-level approval required for apology branch."
+        ]
+      },
+      blue: {
+        findingDetails: [
+          {
+            title: "Ethics before execution",
+            detail: "No recommendation should move to execution queue without trust and fairness gate pass. Recommended action: fail closed when ethics service is unavailable."
+          },
+          {
+            title: "Audit lineage is non-negotiable",
+            detail: "Decision logs must preserve model version, evidence, and operator context to defend legitimacy and improve postmortems."
+          },
+          {
+            title: "Fresh data beats complex models",
+            detail: "In high-volatility windows, recency and source confidence dominate predictive value."
+          }
+        ],
+        liveTemplates: [
+          "Ingestion health: schema compliance at 98.7%.",
+          "Scoring run: top issue cluster recalculated with new volatility input.",
+          "Simulation engine: counterattack scenario confidence narrowed by 6 points.",
+          "Audit service: signed run ledger appended and verified.",
+          "Drift monitor: no critical drift; model remains in stable band."
+        ]
+      },
+      green: {
+        findingDetails: [
+          {
+            title: "Fixed narrative, local proof",
+            detail: "Core values stay static while evidence adapts by district and segment. Recommended action: local teams can change examples, not commitments."
+          },
+          {
+            title: "Visible corrections build trust",
+            detail: "Public correction log has better credibility outcomes than deletion or silent edits."
+          },
+          {
+            title: "Community validators outperform",
+            detail: "Trusted local voices transfer confidence better than broad-reach celebrity channels in polarized contexts."
+          }
+        ],
+        liveTemplates: [
+          "Campaign banner pushed: 'Steady Facts. Real Delivery.'",
+          "Segment message: suburban safety and schooling variant released.",
+          "Rebuttal cell: misinformation card deployed in 2 languages.",
+          "Field channel: community leader kit distributed to regional teams.",
+          "Attribution board: Q and A format lifts trust score by +4 this cycle."
+        ]
+      },
+      purple: {
+        findingDetails: [
+          {
+            title: "Trust-adjusted speed wins",
+            detail: "Fast responses are useful only when they preserve coherence and factual integrity."
+          },
+          {
+            title: "Closed-loop command model",
+            detail: "Sense, score, simulate, gate, deploy, and learn must run continuously with explicit ownership."
+          },
+          {
+            title: "Ethics is strategic",
+            detail: "Legitimacy controls are an advantage under fragile public trust, not a drag on performance."
+          }
+        ],
+        liveTemplates: [
+          "Synthesis pass: cross-agent conflicts resolved under trust gate.",
+          "Leadership brief updated with highest-probability risk paths.",
+          "Decision board: tradeoff scorecard recommends option B with safeguards.",
+          "Governance check: all outward lines aligned with canonical message.",
+          "Run closeout: next-cycle priorities queued for day-start alignment."
+        ]
+      }
+    };
+
+    function selectAgent(id) {
+      selectedAgentId = id;
+      selectedFindingIndex = 0;
+
+      document.querySelectorAll(".node").forEach((n) => n.classList.remove("active"));
+      const flowNode = document.getElementById(`flow-${id}`);
+      if (flowNode) flowNode.classList.add("active");
+
+      const agent = agents.find((a) => a.id === id);
+      document.getElementById("intelAgent").textContent = `SELECTED: ${agent.name.toUpperCase()}`;
+
+      renderIntelFindings();
+      renderIntelLive(true);
+      renderVisualLab();
+      log("INTEL CONSOLE", `${agent.name} selected in workflow view.`);
+    }
+
+    function renderIntelFindings() {
+      const data = intelData[selectedAgentId];
+      const list = document.getElementById("findingList");
+      const detail = document.getElementById("findingDetail");
+      list.innerHTML = "";
+
+      data.findingDetails.forEach((f, index) => {
+        const btn = document.createElement("button");
+        btn.className = "finding-btn" + (index === selectedFindingIndex ? " active" : "");
+        btn.textContent = f.title;
+        btn.addEventListener("click", () => {
+          selectedFindingIndex = index;
+          renderIntelFindings();
+        });
+        list.appendChild(btn);
+      });
+
+      const active = data.findingDetails[selectedFindingIndex];
+      detail.innerHTML = `<strong>${active.title}</strong><br><br>${active.detail}`;
+    }
+
+    function pushLiveItem(text, channel) {
+      const feed = document.getElementById("liveFeed");
+      const item = document.createElement("div");
+      item.className = "feed-item";
+      item.innerHTML = `<div class="feed-head"><span>${channel}</span><span>${nowTime()}</span></div>${text}`;
+      feed.prepend(item);
+      while (feed.children.length > 14) feed.removeChild(feed.lastChild);
+    }
+
+    function renderIntelLive(reset) {
+      const feed = document.getElementById("liveFeed");
+      if (reset) feed.innerHTML = "";
+      if (intelFeedTimer) clearInterval(intelFeedTimer);
+
+      const data = intelData[selectedAgentId];
+      const channelsByAgent = {
+        yellow: ["media pulse", "social signal", "field intel"],
+        red: ["design ops", "workflow", "quality gate"],
+        blue: ["engine", "pipeline", "audit"],
+        green: ["campaign", "distribution", "rebuttal"],
+        purple: ["orchestration", "decision board", "governance"]
+      };
+
+      data.liveTemplates.slice(0, 3).forEach((t, i) => {
+        pushLiveItem(t, channelsByAgent[selectedAgentId][i % channelsByAgent[selectedAgentId].length]);
+      });
+
+      intelFeedTimer = setInterval(() => {
+        const template = data.liveTemplates[Math.floor(Math.random() * data.liveTemplates.length)];
+        const channel = channelsByAgent[selectedAgentId][Math.floor(Math.random() * channelsByAgent[selectedAgentId].length)];
+        pushLiveItem(template, channel);
+      }, 2200);
+    }
+
+    function metricCard(label, value) {
+      return `
+        <div class="viz-card">
+          <div class="viz-k">${label}</div>
+          <div style="font-size:20px;font-weight:700;">${value}%</div>
+          <div class="mini-bar"><span style="width:${value}%;"></span></div>
+        </div>
+      `;
+    }
+
+    function renderVisualLab() {
+      const box = document.getElementById("visualLab");
+      if (visualTimer) clearInterval(visualTimer);
+
+      if (selectedAgentId === "green") {
+        const slogans = [
+          { s: "Steady Facts. Real Delivery.", sub: "Campaign trust banner - national line" },
+          { s: "One Plan, Every District.", sub: "Regional adaptation banner - consistency first" },
+          { s: "Proof Over Noise.", sub: "Rapid rebuttal banner - misinformation defense" },
+          { s: "Calm Leadership, Clear Results.", sub: "Stability frame for suburban and undecided blocs" }
+        ];
+        let idx = 0;
+        function drawBanner() {
+          const b = slogans[idx % slogans.length];
+          box.innerHTML = `
+            <div class="banner">
+              <div class="slogan">${b.s}</div>
+              <div class="subline">${b.sub}</div>
+            </div>
+            ${metricCard("message resonance", 66 + Math.floor(Math.random() * 24))}
+            ${metricCard("trust retention", 61 + Math.floor(Math.random() * 26))}
+            ${metricCard("rebuttal speed", 58 + Math.floor(Math.random() * 30))}
+          `;
+          idx += 1;
+        }
+        drawBanner();
+        visualTimer = setInterval(drawBanner, 2600);
+        return;
+      }
+
+      if (selectedAgentId === "yellow") {
+        function drawNewsViz() {
+          box.innerHTML = `
+            ${metricCard("media volatility", 52 + Math.floor(Math.random() * 35))}
+            ${metricCard("misinfo velocity", 44 + Math.floor(Math.random() * 40))}
+            ${metricCard("trust pressure", 48 + Math.floor(Math.random() * 34))}
+            ${metricCard("signal confidence", 64 + Math.floor(Math.random() * 26))}
+          `;
+        }
+        drawNewsViz();
+        visualTimer = setInterval(drawNewsViz, 1800);
+        return;
+      }
+
+      if (selectedAgentId === "blue") {
+        function drawBlueViz() {
+          box.innerHTML = `
+            ${metricCard("ingestion health", 77 + Math.floor(Math.random() * 20))}
+            ${metricCard("decision latency", 58 + Math.floor(Math.random() * 30))}
+            ${metricCard("audit integrity", 81 + Math.floor(Math.random() * 18))}
+            ${metricCard("ethics gate pass", 69 + Math.floor(Math.random() * 25))}
+          `;
+        }
+        drawBlueViz();
+        visualTimer = setInterval(drawBlueViz, 1900);
+        return;
+      }
+
+      if (selectedAgentId === "red") {
+        function drawRedViz() {
+          box.innerHTML = `
+            ${metricCard("handoff quality", 61 + Math.floor(Math.random() * 30))}
+            ${metricCard("message consistency", 68 + Math.floor(Math.random() * 28))}
+            ${metricCard("sla compliance", 55 + Math.floor(Math.random() * 35))}
+            ${metricCard("workflow clarity", 64 + Math.floor(Math.random() * 30))}
+          `;
+        }
+        drawRedViz();
+        visualTimer = setInterval(drawRedViz, 2000);
+        return;
+      }
+
+      function drawPurpleViz() {
+        box.innerHTML = `
+          ${metricCard("cross-agent alignment", 62 + Math.floor(Math.random() * 33))}
+          ${metricCard("risk posture", 54 + Math.floor(Math.random() * 35))}
+          ${metricCard("decision confidence", 57 + Math.floor(Math.random() * 34))}
+          ${metricCard("trust-first compliance", 65 + Math.floor(Math.random() * 30))}
+        `;
+      }
+      drawPurpleViz();
+      visualTimer = setInterval(drawPurpleViz, 2000);
+    }
+
+    function getAgentContribution(id) {
+      const agent = agents.find((a) => a.id === id);
+      const state = agentState[id] || { status: "idle", progress: 0, findingsShown: 0 };
+      const intel = intelData[id];
+      const detail = intel.findingDetails[Math.min(state.findingsShown, intel.findingDetails.length - 1)] || intel.findingDetails[0];
+      const level = state.status === "done" ? "high" : state.status === "running" ? "medium" : "low";
+      return {
+        name: agent.name,
+        level,
+        role: agent.role,
+        note: detail.title,
+        progress: state.progress || 0
+      };
+    }
+
+    function buildHeadline(corePoints) {
+      const options = [
+        "Voters Want Honest Answers, and Trust Is Now the Biggest Battleground",
+        "One Rumor Can Change Everything: Campaign Team Moves Faster to Keep Trust",
+        "From Panic to Plan: War Room Finds What People Actually Care About",
+        "Clear Message, Calm Response: Campaign Focuses on Trust Over Noise",
+        "People Are Tired of Drama - This New Strategy Puts Facts First"
+      ];
+      return options[Math.floor(Math.random() * options.length)];
+    }
+
+    function generateNewsArticle(reason = "scheduled") {
+      articleCounter += 1;
+
+      const corePoints = ["trust is fragile", "mixed messages hurt confidence", "people want simple clear updates"];
+
+      const headline = buildHeadline(corePoints);
+      const trustState = el.trustIndex.textContent;
+      const workflow = el.workflowPct.textContent;
+      const signals = el.signals.textContent;
+      const handoffs = el.handoffCount.textContent;
+      const stamp = new Date();
+
+      const lede = `In today\'s war room simulation, public trust remained ${trustState.toLowerCase()} while teams handled fast-moving campaign pressure across messaging, policy focus, and rumor response.`;
+      const nutgraf = `The campaign processed ${signals} live updates, completed ${handoffs} handoffs between specialist teams, and reached ${workflow} progress in the active decision cycle. The core finding is simple: people respond best to clear, calm, and consistent communication.`;
+      const body = [
+        "Editors observed that confidence rises when leaders explain what is known, what is still uncertain, and what will happen next. When language becomes defensive or overly technical, trust slips quickly.",
+        "The research desk reported that fear-heavy narratives can spread faster than policy announcements, especially in private channels. In response, the strategy and design desks kept a single campaign line and avoided mixed wording across regions.",
+        "On outreach, the distribution team focused on plain-language messages and visible corrections whenever rumors appeared. This approach reduced confusion and improved understanding in districts with high information noise.",
+        "Overall, the simulation suggests that election communication works best when facts are repeated consistently, corrections are public, and promises are tied to clear next steps people can verify."
+      ];
+      const quote = "People are not asking for perfect politics. They are asking for clear answers they can trust.";
+      const factbox = [
+        `Signals reviewed: ${signals}`,
+        `Workflow completion: ${workflow}`,
+        `Handoffs completed: ${handoffs}`,
+        `Trust posture: ${trustState}`
+      ];
+
+      const sources = [
+        { label: "War Room Full Pipeline Findings", href: "WAR_ROOM_FULL_PIPELINE_FINDINGS.md" },
+        { label: "War Room Charter", href: "WAR_ROOM_CHARTER.md" },
+        { label: "Decision Scorecard Template", href: "DECISION_SCORECARD_TEMPLATE.md" },
+        { label: "Crisis Playbook Matrix", href: "CRISIS_PLAYBOOK_MATRIX.md" },
+        { label: "7-Day Simulation Runbook", href: "SIMULATION_RUNBOOK_7_DAY.md" }
+      ];
+
+      const contributions = flowOrder.map((id) => getAgentContribution(id));
+
+      latestArticle = {
+        id: articleCounter,
+        reason,
+        timestamp: stamp,
+        headline,
+        dek: "A live newsroom-style brief from the simulation floor, written in plain English with verifiable source references.",
+        lede,
+        nutgraf,
+        body,
+        quote,
+        factbox,
+        sources,
+        contributions
+      };
+
+      articleArchive.unshift(latestArticle);
+      if (articleArchive.length > 12) articleArchive.pop();
+
+      renderNewsArticle(latestArticle);
+      renderContributions(latestArticle.contributions);
+      renderArchive();
+
+      const source = reason === "manual" ? "MANUAL" : reason === "auto-demo" ? "AUTO DEMO" : "AUTO 3H";
+      el.newsMeta.textContent = `Last update ${stamp.toLocaleString()} (${source})`;
+      log("NEWSWIRE", `Article #${latestArticle.id} published: ${latestArticle.headline}`);
+    }
+
+    function renderNewsArticle(article) {
+      el.newsArticle.innerHTML = `
+        <div class="news-masthead">
+          <div class="news-paper">The Octopus Daily</div>
+          <div class="news-edition">Special Simulation Edition</div>
+        </div>
+        <div class="news-kicker">WAR ROOM BRIEF #${article.id}</div>
+        <div class="news-headline">${article.headline}</div>
+        <div class="news-byline">By Octopus News Desk | ${article.timestamp.toLocaleString()}</div>
+        <div class="news-dek">${article.dek}</div>
+        <div class="news-story">
+          <p class="news-dropcap">${article.lede}</p>
+          <p>${article.nutgraf}</p>
+          <div class="news-quote">"${article.quote}"</div>
+          <div class="factbox"><b>At a Glance</b>${article.factbox.map((f) => `<div>${f}</div>`).join("")}</div>
+          ${article.body.map((p) => `<p>${p}</p>`).join("")}
+        </div>
+        <div class="source-list">
+          <strong>Sources:</strong><br>
+          ${article.sources.map((s) => `<a href="${s.href}" target="_blank">${s.label}</a>`).join("<br>")}
+        </div>
+      `;
+    }
+
+    function renderContributions(contributions) {
+      const prettyImpact = { high: "Major", medium: "Moderate", low: "Emerging" };
+      el.contribGrid.innerHTML = contributions.map((c) => `
+        <div class="contrib">
+          <b>${c.name}</b>
+          What they added: ${c.note}<br>
+          Impact on story: ${prettyImpact[c.level] || "Emerging"}<br>
+          Status at publish: ${c.progress}% complete
+        </div>
+      `).join("");
+    }
+
+    function renderArchive() {
+      el.newsArchive.innerHTML = articleArchive.map((a) => `
+        <div class="archive-item" data-id="${a.id}">
+          #${a.id} - ${a.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${a.headline}
+        </div>
+      `).join("");
+
+      el.newsArchive.querySelectorAll(".archive-item").forEach((item) => {
+        item.addEventListener("click", () => {
+          const id = Number(item.dataset.id);
+          const article = articleArchive.find((a) => a.id === id);
+          if (!article) return;
+          renderNewsArticle(article);
+          renderContributions(article.contributions);
+          el.newsMeta.textContent = `Viewing article #${article.id} from ${article.timestamp.toLocaleString()}`;
+        });
+      });
+    }
+
+    function startNewsAutoCycle() {
+      if (articleTimer) clearInterval(articleTimer);
+      const interval = demoMode ? NEWS_DEMO_MS : NEWS_INTERVAL_MS;
+      el.newsCycle.textContent = demoMode ? "AUTO CYCLE: EVERY 30 SECONDS (DEMO)" : "AUTO CYCLE: EVERY 3 HOURS";
+      articleTimer = setInterval(() => {
+        generateNewsArticle(demoMode ? "auto-demo" : "auto-3h");
+      }, interval);
+    }
+
+    function downloadCurrentArticlePdf() {
+      if (!latestArticle) {
+        log("NEWSWIRE", "PDF export skipped. No article available yet.");
+        return;
+      }
+
+      const popup = window.open("", "_blank");
+      if (!popup) return;
+
+      const html = `
+        <!doctype html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>War Room News Article #${latestArticle.id}</title>
+          <style>
+            body { font-family: Georgia, 'Times New Roman', serif; margin: 32px; color: #111; }
+            .masthead { border-bottom: 2px solid #111; padding-bottom: 8px; margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center; }
+            .paper { font-size: 28px; font-weight: 700; letter-spacing: 1px; }
+            .edition { font-size: 11px; color: #555; font-family: Arial, sans-serif; text-transform: uppercase; }
+            h1 { font-size: 30px; margin: 0 0 8px; line-height:1.25; }
+            .meta { color: #444; font-size: 12px; margin-bottom: 16px; font-family: Arial, sans-serif; text-transform: uppercase; }
+            .dek { font-size: 17px; margin-bottom: 14px; line-height:1.45; }
+            .story { column-count: 2; column-gap: 22px; line-height: 1.6; font-size: 15px; }
+            .story p { margin: 0 0 12px; }
+            .dropcap::first-letter { float: left; font-size: 42px; line-height: 0.9; padding-right: 7px; font-weight: 700; }
+            .quote { border-left: 3px solid #444; padding-left: 10px; font-style: italic; margin-bottom: 10px; }
+            .factbox { border: 1px solid #ccc; background: #f5f2ea; padding: 8px; margin-bottom: 12px; font-size: 13px; }
+            .sources { border-top: 1px solid #bbb; margin-top: 12px; padding-top: 10px; font-family: Arial, sans-serif; font-size: 12px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+            th, td { border: 1px solid #bbb; padding: 8px; font-size: 12px; text-align: left; }
+            th { background: #f0f0f0; }
+          </style>
+        </head>
+        <body>
+          <div class="masthead"><div class="paper">The Octopus Daily</div><div class="edition">Special Simulation Edition</div></div>
+          <h1>${latestArticle.headline}</h1>
+          <div class="meta">War Room Brief #${latestArticle.id} | Generated ${latestArticle.timestamp.toLocaleString()}</div>
+          <div class="dek">${latestArticle.dek}</div>
+          <div class="story">
+            <p class="dropcap">${latestArticle.lede}</p>
+            <p>${latestArticle.nutgraf}</p>
+            <div class="quote">"${latestArticle.quote}"</div>
+            <div class="factbox"><strong>At a Glance</strong><br>${latestArticle.factbox.join("<br>")}</div>
+            ${latestArticle.body.map((p) => `<p>${p}</p>`).join("")}
+          </div>
+          <div class="sources"><strong>Sources:</strong><br>${latestArticle.sources.map((s) => s.label).join("<br>")}</div>
+          <h2>Agent Contributions</h2>
+          <table>
+            <thead><tr><th>Agent</th><th>Role</th><th>Contribution</th><th>Impact</th><th>Progress</th></tr></thead>
+            <tbody>
+              ${latestArticle.contributions.map((c) => `<tr><td>${c.name}</td><td>${c.role}</td><td>${c.note}</td><td>${c.level.toUpperCase()}</td><td>${c.progress}%</td></tr>`).join("")}
+            </tbody>
+          </table>
+          <script>window.onload = () => window.print();<\/script>
+        </body>
+        </html>
+      `;
+
+      popup.document.write(html);
+      popup.document.close();
+      log("NEWSWIRE", `Article #${latestArticle.id} opened for PDF export.`);
+    }
+
+    function setAgentStatus(id, status, taskText) {
+      const state = agentState[id];
+      state.status = status;
+
+      const tag = document.getElementById(`tag-${id}`);
+      const task = document.getElementById(`task-${id}`);
+      const card = document.getElementById(`agent-${id}`);
+      const flowNode = document.getElementById(`flow-${id}`);
+
+      tag.className = "tag";
+      card.classList.remove("running");
+      flowNode.classList.remove("active");
+
+      if (status === "running") {
+        tag.classList.add("running-tag");
+        tag.textContent = "running";
+        card.classList.add("running");
+        flowNode.classList.add("active");
+      } else if (status === "done") {
+        tag.classList.add("done");
+        tag.textContent = "done";
+      } else {
+        tag.classList.add("idle");
+        tag.textContent = "idle";
+      }
+
+      task.textContent = taskText;
+    }
+
+    function setProgress(id, pct) {
+      agentState[id].progress = pct;
+      document.getElementById(`bar-${id}`).style.width = `${pct}%`;
+    }
+
+    function addFinding(id, text) {
+      const ul = document.getElementById(`findings-${id}`);
+      const li = document.createElement("li");
+      li.textContent = text;
+      ul.appendChild(li);
+      ul.scrollTop = ul.scrollHeight;
+    }
+
+    function tickSignals() {
+      signalCounter += Math.floor(Math.random() * 22) + 10;
+      el.signals.textContent = String(signalCounter);
+    }
+
+    function setWorkflowProgress() {
+      const done = flowOrder.filter((id) => agentState[id].status === "done").length;
+      const pct = Math.floor((done / flowOrder.length) * 100);
+      el.workflowPct.textContent = `${pct}%`;
+      if (pct < 40) el.trustIndex.textContent = "Stable";
+      else if (pct < 80) el.trustIndex.textContent = "Guarded";
+      else el.trustIndex.textContent = "Aligned";
+    }
+
+    function resetUI() {
+      clearTimers();
+      if (intelFeedTimer) clearInterval(intelFeedTimer);
+      if (visualTimer) clearInterval(visualTimer);
+      if (articleTimer) clearInterval(articleTimer);
+      paused = false;
+      runningPipeline = false;
+      eventCounter = 0;
+      handoffCounter = 0;
+      signalCounter = 0;
+      articleCounter = 0;
+      latestArticle = null;
+      articleArchive.length = 0;
+      el.stream.innerHTML = "";
+      el.handoffs.innerHTML = "";
+      el.contribGrid.innerHTML = "";
+      el.newsArchive.innerHTML = "";
+      el.eventCount.textContent = "0 entries";
+      el.handoffLabel.textContent = "0 created";
+      el.handoffCount.textContent = "0";
+      el.workflowPct.textContent = "0%";
+      el.signals.textContent = "0";
+      el.runLabel.textContent = "NO ACTIVE RUN";
+      el.activeStage.textContent = "STAGE: WAITING";
+      el.trustIndex.textContent = "Stable";
+      renderAgents();
+      renderFlow();
+      selectAgent("yellow");
+      el.newsArticle.innerHTML = `
+        <div class="news-masthead">
+          <div class="news-paper">The Octopus Daily</div>
+          <div class="news-edition">Special Simulation Edition</div>
+        </div>
+        <div class="news-kicker">WAR ROOM BRIEF</div>
+        <div class="news-headline">Awaiting first generated article</div>
+        <div class="news-byline">By Octopus News Desk</div>
+        <div class="news-dek">Run agents or trigger article generation to publish a full plain-language report with sourcing.</div>
+        <div class="news-story">
+          <p class="news-dropcap">This panel publishes a newspaper-style article after each simulation cycle. It includes a short report, context paragraph, quote, and source references.</p>
+        </div>
+        <div class="source-list">Sources will appear here after first publication.</div>
+      `;
+      el.newsMeta.textContent = "No article generated yet.";
+      toggleButtons(false);
+      startNewsAutoCycle();
+      log("SYSTEM", "Dashboard reset. Ready for activation.");
+    }
+
+    function clearTimers() {
+      timers.forEach((t) => clearInterval(t));
+      timers.clear();
+    }
+
+    function scheduleEvery(fn, ms) {
+      const id = setInterval(() => {
+        if (!paused) fn();
+      }, ms);
+      timers.add(id);
+      return id;
+    }
+
+    function toggleButtons(isRunning) {
+      el.startAll.disabled = isRunning;
+      el.pauseBtn.disabled = !isRunning;
+      el.resumeBtn.disabled = !isRunning;
+      document.getElementById("startYellow").disabled = isRunning;
+      document.getElementById("startRed").disabled = isRunning;
+      document.getElementById("startBlue").disabled = isRunning;
+      document.getElementById("startGreen").disabled = isRunning;
+      document.getElementById("startPurple").disabled = isRunning;
+    }
+
+    function runSingleAgent(agentId, onComplete) {
+      const a = agents.find((x) => x.id === agentId);
+      const state = agentState[agentId];
+      if (!a || state.status === "running" || state.status === "done") {
+        if (onComplete) onComplete();
+        return;
+      }
+
+      setAgentStatus(agentId, "running", "Processing live signals and drafting output...");
+      el.activeStage.textContent = `STAGE: ${a.name.toUpperCase()} ACTIVE`;
+      log(a.name, "Activation confirmed.");
+
+      let idx = 0;
+      let pct = 0;
+
+      const stepTimer = scheduleEvery(() => {
+        if (idx < a.stream.length) {
+          log(a.name, a.stream[idx]);
+          tickSignals();
+          pct = Math.min(88, pct + 16);
+          setProgress(agentId, pct);
+          idx += 1;
+        }
+      }, 900);
+
+      const findingsTimer = scheduleEvery(() => {
+        if (state.findingsShown < a.findings.length) {
+          addFinding(agentId, a.findings[state.findingsShown]);
+          state.findingsShown += 1;
+        }
+      }, 1300);
+
+      const finishTimer = scheduleEvery(() => {
+        if (idx >= a.stream.length && state.findingsShown >= a.findings.length) {
+          clearInterval(stepTimer);
+          clearInterval(findingsTimer);
+          clearInterval(finishTimer);
+          timers.delete(stepTimer);
+          timers.delete(findingsTimer);
+          timers.delete(finishTimer);
+
+          setProgress(agentId, 100);
+          setAgentStatus(agentId, "done", "Completed. Findings and artifacts ready for handoff.");
+          setWorkflowProgress();
+          log(a.name, "Execution complete.");
+          if (onComplete) onComplete(a);
+        }
+      }, 500);
+    }
+
+    function runPipeline() {
+      if (runningPipeline) return;
+      runningPipeline = true;
+      toggleButtons(true);
+      el.runLabel.textContent = "PIPELINE: ACTIVE";
+      log("PURPLE MANAGER", "Full pipeline activation started.");
+
+      const chain = [...flowOrder];
+
+      function next() {
+        if (!chain.length) {
+          log("PURPLE MANAGER", "All agents complete. Unified package published.");
+          el.runLabel.textContent = "PIPELINE: COMPLETE";
+          el.activeStage.textContent = "STAGE: COMPLETE";
+          runningPipeline = false;
+          toggleButtons(false);
+          el.pauseBtn.disabled = true;
+          el.resumeBtn.disabled = true;
+          return;
+        }
+
+        const currentId = chain.shift();
+        const currentAgent = agents.find((x) => x.id === currentId);
+        const nextId = chain[0];
+        const nextAgent = agents.find((x) => x.id === nextId);
+
+        runSingleAgent(currentId, () => {
+          if (nextAgent) {
+            addHandoff(
+              currentAgent.name,
+              nextAgent.name,
+              `${currentAgent.name} completed scoped deliverables and prepared transfer package.`,
+              currentAgent.artifacts,
+              `Continue with ${nextAgent.role.toLowerCase()} using handoff context.`
+            );
+          } else {
+            addHandoff(
+              currentAgent.name,
+              "Mission Complete",
+              "Final synthesis delivered with integrated findings and trust-first recommendations.",
+              currentAgent.artifacts,
+              "Prepare briefing deck and execute next cycle simulation."
+            );
+          }
+          next();
+        });
+      }
+
+      next();
+    }
+
+    function initClock() {
+      scheduleEvery(() => {
+        el.clock.textContent = `STATE: ${runningPipeline ? (paused ? "PAUSED" : "ACTIVE") : "READY"} | ${nowTime()}`;
+      }, 200);
+    }
+
+    document.getElementById("startAll").addEventListener("click", runPipeline);
+    document.getElementById("pauseBtn").addEventListener("click", () => {
+      if (!runningPipeline) return;
+      paused = true;
+      log("SYSTEM", "Pipeline paused.");
+      el.runLabel.textContent = "PIPELINE: PAUSED";
+      el.pauseBtn.disabled = true;
+      el.resumeBtn.disabled = false;
+    });
+    document.getElementById("resumeBtn").addEventListener("click", () => {
+      if (!runningPipeline) return;
+      paused = false;
+      log("SYSTEM", "Pipeline resumed.");
+      el.runLabel.textContent = "PIPELINE: ACTIVE";
+      el.pauseBtn.disabled = false;
+      el.resumeBtn.disabled = true;
+    });
+    document.getElementById("resetBtn").addEventListener("click", resetUI);
+
+    document.getElementById("startYellow").addEventListener("click", () => runSingleAgent("yellow", setWorkflowProgress));
+    document.getElementById("startRed").addEventListener("click", () => runSingleAgent("red", setWorkflowProgress));
+    document.getElementById("startBlue").addEventListener("click", () => runSingleAgent("blue", setWorkflowProgress));
+    document.getElementById("startGreen").addEventListener("click", () => runSingleAgent("green", setWorkflowProgress));
+    document.getElementById("startPurple").addEventListener("click", () => runSingleAgent("purple", setWorkflowProgress));
+    document.getElementById("generateNews").addEventListener("click", () => generateNewsArticle("manual"));
+    document.getElementById("downloadPdf").addEventListener("click", downloadCurrentArticlePdf);
+    document.getElementById("toggleDemo").addEventListener("click", () => {
+      demoMode = !demoMode;
+      el.toggleDemo.textContent = `Demo Mode: ${demoMode ? "On" : "Off"}`;
+      startNewsAutoCycle();
+      log("NEWSWIRE", demoMode ? "Demo mode enabled. Auto article every 30 seconds." : "Demo mode disabled. Auto article every 3 hours.");
+    });
+
+    document.querySelectorAll(".intel-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".intel-tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        intelTab = tab.dataset.tab;
+        document.querySelectorAll(".intel-body").forEach((b) => b.classList.remove("active"));
+        document.getElementById(`intel-${intelTab}`).classList.add("active");
+      });
+    });
+
+    renderAgents();
+    renderFlow();
+    selectAgent("yellow");
+    startNewsAutoCycle();
+    generateNewsArticle("startup");
+    initClock();
+    log("SYSTEM", "War Room Live initialized. Activate full pipeline when ready.");
+  </script>
+</body>
+</html>
